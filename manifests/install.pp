@@ -10,15 +10,9 @@ class docker::install {
   validate_string($::kernelrelease)
   validate_bool($docker::use_upstream_package_source)
 
-  $prerequired_packages = $::operatingsystem ? {
-    'Debian' => ['apt-transport-https', 'cgroupfs-mount'],
-    'Ubuntu' => ['apt-transport-https', 'cgroup-lite', 'apparmor'],
-    default  => '',
-  }
-
   case $::osfamily {
     'Debian': {
-      ensure_packages($prerequired_packages)
+      ensure_packages($docker::prerequired_packages)
       if $docker::manage_package {
         Package['apt-transport-https'] -> Package['docker']
       }
@@ -56,8 +50,8 @@ class docker::install {
         case $::operatingsystemrelease {
           # On Ubuntu 12.04 (precise) install the backported 13.10 (saucy) kernel
           '12.04': { $kernelpackage = [
-                                        'linux-image-generic-lts-saucy',
-                                        'linux-headers-generic-lts-saucy'
+                                        'linux-image-generic-lts-trusty',
+                                        'linux-headers-generic-lts-trusty'
                                       ]
           }
           # determine the package name for 'linux-image-extra-$(uname -r)' based
