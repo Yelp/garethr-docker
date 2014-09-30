@@ -5,7 +5,7 @@
 define docker::run(
   $image,
   $command = undef,
-  $memory_limit = '0',
+  $memory_limit = '0b',
   $ports = [],
   $expose = [],
   $volumes = [],
@@ -22,6 +22,7 @@ define docker::run(
   $restart_service = true,
   $disable_network = false,
   $privileged = false,
+  $extra_parameters = undef,
 ) {
   include docker::params
   $docker_command = $docker::params::docker_command
@@ -29,7 +30,7 @@ define docker::run(
 
   validate_re($image, '^[\S]*$')
   validate_re($title, '^[\S]*$')
-  validate_re($memory_limit, '^[\d]*$')
+  validate_re($memory_limit, '^[\d]*(b|k|m|g)$')
   validate_string($docker_command)
   validate_string($service_name)
   if $command {
@@ -44,6 +45,7 @@ define docker::run(
   validate_bool($running)
   validate_bool($disable_network)
   validate_bool($privileged)
+  validate_bool($restart_service)
 
   $ports_array = any2array($ports)
   $expose_array = any2array($expose)
@@ -52,6 +54,7 @@ define docker::run(
   $dns_array = any2array($dns)
   $links_array = any2array($links)
   $lxc_conf_array = any2array($lxc_conf)
+  $extra_parameters_array = any2array($extra_parameters)
 
   $sanitised_title = regsubst($title, '[^0-9A-Za-z.\-]', '-')
 
@@ -60,18 +63,26 @@ define docker::run(
     default  => undef,
   }
 
-  $notify = str2bool($restart_service) ? {
-    true    => Service["docker-${sanitised_title}"],
-    default => undef,
-  }
-
   case $::osfamily {
     'Debian': {
-      $initscript = "/etc/init/docker-${sanitised_title}.conf"
-      $init_template = 'docker/etc/init/docker-run.conf.erb'
+      $initscript = "/etc/init.d/docker-${sanitised_title}"
+      $deprecated_initscript = "/etc/init/docker-${sanitised_title}.conf"
+      $init_template = 'docker/etc/init.d/docker-run.erb'
       $hasstatus  = true
       $hasrestart = false
-      $mode = '0644'
+      $mode = '0755'
+
+      # When switching between styles of init scripts (e.g. upstart and sysvinit),
+      # we want to stop the service using the old init script. Since `service` will
+      # prefer a sysvinit style script over an upstart one if both exist, we need
+      # to stop the service before adding the sysvinit script.
+      exec { "service docker-${sanitised_title} stop":
+        onlyif  => "test -f ${deprecated_initscript}"
+      } ->
+      file { $deprecated_initscript:
+        ensure => 'removed'
+      } ->
+      File[$initscript]
     }
     'RedHat': {
       $initscript = "/etc/init.d/docker-${sanitised_title}"
@@ -89,7 +100,6 @@ define docker::run(
     ensure  => present,
     content => template($init_template),
     mode    => $mode,
-    notify  => $notify,
   }
 
   service { "docker-${sanitised_title}":
@@ -101,11 +111,10 @@ define docker::run(
     require    => File[$initscript],
   }
 
-  if str2bool($restart_service) {
+  if $restart_service {
     File[$initscript] ~> Service["docker-${sanitised_title}"]
   }
   else {
     File[$initscript] -> Service["docker-${sanitised_title}"]
   }
 }
-
