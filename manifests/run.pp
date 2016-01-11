@@ -115,7 +115,10 @@ define docker::run(
   })
 
   $sanitised_title = regsubst($title, '[^0-9A-Za-z.\-]', '-', 'G')
-  $sanitised_depends_array = regsubst($depends_array, '[^0-9A-Za-z.\-]', '-', 'G')
+  $sanitised_depends_array = size($depends_array) ? {
+    0       => [],
+    default => regsubst($depends_array, '[^0-9A-Za-z.\-]', '-', 'G')
+  }
 
   if $restart {
 
