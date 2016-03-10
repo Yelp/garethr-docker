@@ -50,6 +50,7 @@ describe 'docker', :type => :class do
         context 'when given a specific tmp_dir' do
           let(:params) {{ 'tmp_dir' => '/bigtmp' }}
           it { should contain_file('/etc/default/docker').with_content(/export TMPDIR="\/bigtmp"/) }
+          it { should contain_file('/etc/default/docker').with_content(/export DOCKER_TMPDIR="\/bigtmp"/) }
         end
 
         context 'with custom service_name' do
@@ -82,6 +83,7 @@ describe 'docker', :type => :class do
         context 'when given a specific tmp_dir' do
           let(:params) {{ 'tmp_dir' => '/bigtmp' }}
           it { should contain_file('/etc/sysconfig/docker').with_content(/export TMPDIR="\/bigtmp"/) }
+          it { should contain_file('/etc/sysconfig/docker').with_content(/export DOCKER_TMPDIR="\/bigtmp"/) }
         end
 
         context 'It should include default prerequired_packages' do
