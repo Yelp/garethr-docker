@@ -16,6 +16,7 @@ export no_proxy='<%= Array(@no_proxy).join(',') %>'
 
 # # This is also a handy place to tweak where Docker's temporary files go.
 export TMPDIR="<%= @tmp_dir %>"
+export DOCKER_TMPDIR="<%= @tmp_dir %>"
 
 # # Use DOCKER_OPTS to modify the daemon startup options.
 DOCKER_OPTS="\
