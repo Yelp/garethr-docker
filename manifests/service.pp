@@ -133,6 +133,19 @@ class docker::service (
     hasstatus  => $hasstatus,
     hasrestart => $hasrestart,
     provider   => $provider,
+  } ->
+
+  file { '/nail/sys/bin/clean_up_dead_containers.sh':
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/docker/clean_up_dead_containers.sh',
+  } ->
+
+  exec { 'clean_up_dead_containers.sh':
+    command     => '/nail/sys/bin/clean_up_dead_containers.sh',
+    subscribe   => Service['docker'],
+    refreshonly => true,
   }
 
 }
