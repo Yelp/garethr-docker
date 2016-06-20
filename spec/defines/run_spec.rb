@@ -72,7 +72,7 @@ require 'spec_helper'
       it { should contain_file(initscript).with_content(/ --name sample /) }
       # We only care about Debian for now
       if osfamily == 'Debian'
-        it { should contain_file(initscript).with_content(%r|\$docker rm sample > /dev/null 2>&1|) }
+        it { should contain_file(initscript).with_content(%r|\$docker rm sample >/dev/null 2>&1|) }
       end
     end
 
