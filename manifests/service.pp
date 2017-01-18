@@ -121,9 +121,10 @@ class docker::service (
     }
   }
 
-  $provider = $::operatingsystem ? {
-    'Ubuntu' => 'upstart',
-    default  => undef,
+  if $::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemrelease, '15.04') < 0 {
+    $provider = 'upstart'
+  } else {
+    $provider = undef
   }
 
   service { 'docker':
