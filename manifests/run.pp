@@ -197,7 +197,15 @@ define docker::run(
 
     service { "docker-${sanitised_title}":
       ensure     => $running,
-      enable     => true,
+      enable     => $::lsbdistcodename ? {
+        # upstart
+        lucid   => true,
+        trusty  => true,
+        # systemd can't handle enabling/disabling of /etc/init.d scripts.
+        # We could remove this if we upgraded to the latest garethr-docker (it
+        # supports systemd).
+        default => undef,
+      },
       hasstatus  => $hasstatus,
       hasrestart => $hasrestart,
       require    => File[$initscript],

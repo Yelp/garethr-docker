@@ -59,8 +59,8 @@ start() {
 
     if [ "true" = "$($docker inspect --format='{{.State.Running}}' <%= @sanitised_title %>)" ]; then
        failure
-       printf "Container <%= @sanitised_title %> is still running.\n"
-       exit 7
+       printf "Container <%= @sanitised_title %> is already running.\n"
+       exit 0
     fi
 
     printf "Starting $prog:\t"
