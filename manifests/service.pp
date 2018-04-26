@@ -41,6 +41,7 @@ class docker::service (
   $execdriver           = $docker::execdriver,
   $storage_driver       = $docker::storage_driver,
   $tmp_dir              = $docker::tmp_dir,
+  $docker_version       = $docker::ensure,
 ) {
   $dns_array = any2array($dns)
   $dns_search_array = any2array($dns_search)
