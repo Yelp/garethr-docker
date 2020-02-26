@@ -50,7 +50,7 @@ module Puppet::Parser::Functions
 
     multi_flags = lambda { |values, format|
       filtered = [values].flatten.compact
-      filtered.map { |val| sprintf(format, val) }
+      filtered.map { |val| sprintf(format + " \\\n", val) }
     }
 
     [
@@ -61,14 +61,19 @@ module Puppet::Parser::Functions
       ['--lxc-conf="%s"',   'lxc_conf'],
       ['--volumes-from %s', 'volumes_from'],
       ['-e %s',             'env'],
+      ['--env-file %s',     'env_file'],
       ['-p %s',             'ports'],
+      ['-l %s',             'labels'],
       ['--add-host %s',     'hostentries'],
-      ['-v %s',             'volumes'],
-      ['-H %s',             'socket_connect'],
+      ['-v %s',             'volumes']
     ].each do |(format, key)|
       values    = opts[key]
       new_flags = multi_flags.call(values, format)
       flags.concat(new_flags)
+    end
+
+    opts['extra_params'].each do |param|
+      flags << param
     end
 
     flags.flatten.join(" ")
