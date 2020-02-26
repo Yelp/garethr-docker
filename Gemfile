@@ -12,7 +12,7 @@ group :test do
   gem "puppet-lint"
   gem "puppet-lint-unquoted_string-check"
   gem "rspec-puppet"
-  gem "puppet-syntax"
+  gem "puppet-syntax", "2.1.0"
   gem "puppetlabs_spec_helper"
   gem "metadata-json-lint", "1.1.0"
   gem "rspec"
