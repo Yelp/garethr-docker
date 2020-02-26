@@ -680,9 +680,14 @@ describe 'docker', :type => :class do
         end
       end
 
-      context 'with custom root dir' do
-        let(:params) { {'root_dir' => '/mnt/docker'} }
+      context 'with custom root dir on old docker' do
+        let(:params) { {'root_dir' => '/mnt/docker', 'ensure' => '17.0.2'} }
         it { should contain_file(service_config_file).with_content(/-g \/mnt\/docker/) }
+      end
+
+      context 'with custom root dir on new docker' do
+        let(:params) { {'root_dir' => '/mnt/docker', 'ensure' => '18.04'} }
+        it { should contain_file(service_config_file).with_content(/--data-root \/mnt\/docker/) }
       end
 
       context 'with ensure absent' do

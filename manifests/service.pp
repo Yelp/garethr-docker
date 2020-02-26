@@ -110,6 +110,7 @@ class docker::service (
   $tls_cacert                        = $docker::tls_cacert,
   $tls_cert                          = $docker::tls_cert,
   $tls_key                           = $docker::tls_key,
+  $docker_version                    = $docker::ensure,
 ) {
 
   unless $::osfamily =~ /(Debian|RedHat|Archlinux|Gentoo)/ {
