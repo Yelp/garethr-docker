@@ -46,7 +46,7 @@ class docker::params {
         default: {
           $package_name   = 'docker.io'
           $service_name   = 'docker.io'
-          $docker_command = 'docker.io'
+          $docker_command = 'docker'
         }
       }
       $docker_group = $docker_group_default
