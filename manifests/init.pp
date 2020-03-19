@@ -213,9 +213,9 @@ class docker(
     fail('You need to provide both $dm_datadev and $dm_metadatadev parameters for direct lvm.')
   }
 
-  class { 'docker::install': } ->
-  class { 'docker::config': } ~>
-  class { 'docker::service': }
+  class { 'docker::install': }
+  -> class { 'docker::config': }
+  ~> class { 'docker::service': }
   contain 'docker::install'
   contain 'docker::config'
   contain 'docker::service'

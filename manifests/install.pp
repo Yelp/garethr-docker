@@ -89,6 +89,9 @@ class docker::install {
         }
       }
     }
+    default: {
+      fail("module not supported on ${::osfamily}")
+    }
   }
 
   if $manage_kernel {

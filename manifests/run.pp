@@ -188,24 +188,26 @@ define docker::run(
       exec { "/bin/sh /etc/init.d/docker-${sanitised_title} stop":
         onlyif  => "/usr/bin/test -f /var/run/docker-${sanitised_title}.cid && /usr/bin/test -f /etc/init.d/docker-${sanitised_title}",
         require => [],
-      } ->
-      file { "/var/run/docker-${sanitised_title}.cid":
+      }
+      -> file { "/var/run/docker-${sanitised_title}.cid":
         ensure => absent,
-      } ->
-      File[$initscript]
+      }
+      -> File[$initscript]
+    }
+
+    $enable = $::lsbdistcodename ? {
+      # upstart
+      'lucid'   => true,
+      'trusty'  => true,
+      # systemd can't handle enabling/disabling of /etc/init.d scripts.
+      # We could remove this if we upgraded to the latest garethr-docker (it
+      # supports systemd).
+      default => undef,
     }
 
     service { "docker-${sanitised_title}":
       ensure     => $running,
-      enable     => $::lsbdistcodename ? {
-        # upstart
-        lucid   => true,
-        trusty  => true,
-        # systemd can't handle enabling/disabling of /etc/init.d scripts.
-        # We could remove this if we upgraded to the latest garethr-docker (it
-        # supports systemd).
-        default => undef,
-      },
+      enable     => $enable,
       hasstatus  => $hasstatus,
       hasrestart => $hasrestart,
       require    => File[$initscript],
